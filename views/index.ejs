@@ -1,0 +1,72 @@
+<%- include("partials/header") %>
+<body>
+    <div class="table-container">
+        <h2 class="todo-title">Todo List</h2>
+        <div>
+            <a class="btn" href="/add-todo">Add todo</a>
+        </div>
+
+        <br />
+
+        <!-- Debug info at the top for easier viewing -->
+        <div id="debug-info" style="display: none;">
+            <!-- Debug info will be populated by JavaScript -->
+        </div>
+
+        <% if (Array.isArray(todos) && todos.length > 0) { %>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th>Created at</th>
+                        <th>Updated at</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% todos.forEach(function(todo) { %>
+                        <tr>
+                            <td><%= todo.title %></td>
+                            <td><%= todo.description %></td>
+                            <td><%= todo.createdAt ? new Date(todo.createdAt).toLocaleString() : 'N/A' %></td>
+                            <td><%= todo.updatedAt ? new Date(todo.updatedAt).toLocaleString() : 'N/A' %></td>
+                            <td>
+                                <a class="btn" href="/update-todo/<%= todo._id %>">Edit</a>
+                                <a class="btn" href="/delete-todo/<%= todo._id %>">Delete</a>
+                            </td> 
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        <% } else { %>
+            <p>No todos found. Add some todos to get started!</p>
+        <% } %>
+        
+        <!-- Move debug script to the bottom -->
+        <script>
+            // Safely handle todo data
+            try {
+                const todoCount = <%= todos ? todos.length : 0 %>;
+                const todoData = <%- todos ? JSON.stringify(todos.map(t => ({
+                    id: t._id?.toString(),
+                    title: t.title,
+                    description: t.description,
+                    createdAt: t.createdAt,
+                    updatedAt: t.updatedAt
+                }))) : '[]' %>;
+                
+                console.log('Number of todos:', todoCount);
+                console.log('Todo data:', todoData);
+                
+                // Display debug info in the page
+                document.getElementById('debug-info').innerHTML = `
+                    <pre>Todos count: ${todoCount}</pre>
+                    <pre>Todos data: ${JSON.stringify(todoData, null, 2)}</pre>
+                `;
+            } catch (error) {
+                console.error('Error processing todo data:', error);
+            }
+        </script>
+    </div>
+<%- include("partials/footer") %>
